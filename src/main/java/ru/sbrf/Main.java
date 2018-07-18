@@ -3,16 +3,17 @@ package ru.sbrf;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.CSVUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static ru.sbrf.RandomValueUtils.*;
-import static ru.sbrf.Utils.buildFromFile;
 
 public class Main {
 
@@ -21,24 +22,8 @@ public class Main {
 	private static Resource OUTPUT = new ClassPathResource("OUTPUT.txt");
 
     public static void main(String[] args) throws IOException {
-	//String inputPath = args[0];
-		List<ColumnDataType> typeMapping = getColumnDataTypes(Utils.buildFromFile(TYPE_MAPPING));
-
+    	CSV_TestDataBuilder testDataBuilder = new CSV_TestDataBuilder(TYPE_MAPPING, HEADER_TEMPLATE, OUTPUT);
+		testDataBuilder.buildRandomRecords(2).generate();
 
     }
-    public static List<ColumnDataType> getColumnDataTypes(List<CSVRecord> csvRecordList){
-    	List<ColumnDataType> result = new LinkedList<>();
-		String field;
-		ValueType type;
-		for (CSVRecord csvRecord : csvRecordList){
-    		field = csvRecord.get("FIELD");
-    		try{
-				type = ValueType.valueOf(csvRecord.get("TYPE"));
-			} catch (IllegalArgumentException e) {
-    			continue;
-			}
-    		result.add(new ColumnDataType(field, type));
-		}
-		return result;
-	}
 }

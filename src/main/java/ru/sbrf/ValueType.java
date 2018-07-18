@@ -4,6 +4,7 @@ public enum ValueType {
 	AGRNUM,
 	DATE,
 	FLAG,
+	STRTINYINT,
 	STRSMALLINT,
 	STRBIGINT,
 	DECIMAL,

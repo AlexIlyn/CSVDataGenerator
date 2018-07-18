@@ -1,5 +1,5 @@
 FIELD;TYPE
-agr_cred_id;STRSTRBIGINT
+agr_cred_id;STRBIGINT
 gregor_dt;DATE
 agr_num;AGRNUM
 grntee_agr_num;STRSTRBIGINT
@@ -8,7 +8,7 @@ crncy_id;CURRENCY_ID
 expiration_dt;DATE
 crncy_cd;CURRENCY_CD
 prvsn_port_flag;FLAG
-mis_prod_id;STRBIGINT
+mis_prod_id;STRTINYINT
 agr_qlty_cat_type_id;STRBIGINT
 agr_regls_type_id;STRBIGINT
 agr_srv_qlty_type_id;STRBIGINT
