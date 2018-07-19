@@ -1,15 +1,14 @@
 package ru.sbrf;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.csv.CSVUtils;
+import org.apache.commons.csv.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,36 +18,33 @@ import java.util.Map;
 import static ru.sbrf.RandomValueUtils.getRandomValueByValueType;
 
 public class CSV_TestDataBuilder {
+	private Path OUTPUT;
+	//private Resource OUTPUT_RES;
 
-	private Resource TYPE_MAPPING;
-	private Resource HEADER_TEMPLATE;
-	private Resource OUTPUT;
-
+	private Map<ValueType, List<Integer>> valueTypeListMap;
 	private Map<String, ValueType> typeMapping;
 	private Map<String, Integer> headersMap;
 	private String[] headersArray;
+	private Resource TYPE_MAPPING_RES;
 
 	private List<String[]> records;
 
-	public CSV_TestDataBuilder(Resource TYPE_MAPPING, Resource HEADER_TEMPLATE, Resource OUTPUT) throws IOException {
-		this.TYPE_MAPPING = TYPE_MAPPING;
-		this.HEADER_TEMPLATE = HEADER_TEMPLATE;
-		this.OUTPUT = OUTPUT;
-		typeMapping = getColumnDataTypesMap(Utils.buildFromFile(TYPE_MAPPING));
-		headersMap = CSVUtils.getHeadersMap(HEADER_TEMPLATE);
-		headersArray = CSVUtils.getHeaders(HEADER_TEMPLATE);
+	public CSV_TestDataBuilder(String caseType, String caseSubType, Path OUTPUT) throws IOException {
+		TYPE_MAPPING_RES = new ClassPathResource(String.format("%s\\%s\\TYPE_MAPPING.txt", caseType, caseSubType));
+		this.OUTPUT = OUTPUT.toAbsolutePath();
+		typeMapping = initColumnDataTypesMap(TYPE_MAPPING_RES);
 		records = new ArrayList<>();
 	}
 
 	public CSV_TestDataBuilder buildRandomRecords(int records) {
 
 		for (int i = 0; i < records; i++) {
-			buildNewRandomRecord();
+			buildRandomRecord();
 		}
 		return this;
 	}
 
-	public CSV_TestDataBuilder buildNewRandomRecord() {
+	public CSV_TestDataBuilder buildRandomRecord() {
 		String[] result_array = new String[headersMap.size()];
 		for (String header : headersArray) {
 			if (typeMapping.get(header) != null) {
@@ -59,13 +55,23 @@ public class CSV_TestDataBuilder {
 		return this;
 	}
 
+	public CSV_TestDataBuilder setValueOfFieldsWithType(ValueType valueType, String value){
+		for (int index : valueTypeListMap.get(valueType)){
+			for (String[] record : records){
+				record[index] = value;
+			}
+		}
+		return this;
+	}
+
 	public void generate() throws IOException {
-
 		try (
-				BufferedWriter writer = Files.newBufferedWriter(Paths.get(OUTPUT.getFile().toString()));
+				BufferedWriter writer = Files.newBufferedWriter(OUTPUT);
 
-				CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(headersArray).withDelimiter(';'))
+				CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withDelimiter(';').withEscape(' ').withQuoteMode(QuoteMode.NONE).withTrim())
+//						.withHeader(headersArray)
 		) {
+			csvPrinter.printRecord(headersArray);
 			for (String[] record : records) {
 				csvPrinter.printRecord(record);
 			}
@@ -73,19 +79,31 @@ public class CSV_TestDataBuilder {
 		}
 	}
 
-	public static Map<String, ValueType> getColumnDataTypesMap(List<CSVRecord> csvRecordList) {
-		Map<String, ValueType> result = new HashMap<>();
+	public CSV_TestDataBuilder destroy() throws IOException {
+		File file =  new File(OUTPUT.toString());
+		if(file.exists()) file.delete();
+		return this;
+	}
+
+	private Map<String, ValueType> initColumnDataTypesMap(Resource resource) throws IOException {
+		valueTypeListMap = new HashMap<>();
+		headersArray = CSVUtils.getHeaders(resource);
+		headersMap = CSVUtils.getHeadersMap(resource);
+		Map<String, ValueType> columnDataTypesMap = new HashMap<>();
+		CSVRecord csvRecord = CSVUtils.buildFromFile(resource).get(0);
 		String field;
 		ValueType type;
-		for (CSVRecord csvRecord : csvRecordList) {
-			field = csvRecord.get("FIELD");
+		for (int i = 0; i < headersArray.length; i++) {
+			field = headersArray[i];
 			try {
-				type = ValueType.valueOf(csvRecord.get("TYPE"));
+			type = ValueType.valueOf(csvRecord.get(headersArray[i]));
 			} catch (IllegalArgumentException e) {
 				continue;
 			}
-			result.put(field, type);
+			columnDataTypesMap.put(field, type);
+			valueTypeListMap.computeIfAbsent(type, k -> new ArrayList<>());
+			valueTypeListMap.get(type).add(i);
 		}
-		return result;
+		return columnDataTypesMap;
 	}
 }
