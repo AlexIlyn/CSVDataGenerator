@@ -82,6 +82,7 @@ public class CSV_TestDataBuilder {
 	public CSV_TestDataBuilder destroy() throws IOException {
 		File file =  new File(OUTPUT.toString());
 		if(file.exists()) file.delete();
+		records.clear();
 		return this;
 	}
 
