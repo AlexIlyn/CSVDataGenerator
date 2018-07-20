@@ -34,6 +34,7 @@ public class CSV_TestDataBuilder {
 		this.OUTPUT = OUTPUT.toAbsolutePath();
 		typeMapping = initColumnDataTypesMap(TYPE_MAPPING_RES);
 		records = new ArrayList<>();
+		//TODO System.out.println(new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "\\VERYNEW_NEW.NEW"));
 	}
 
 	public CSV_TestDataBuilder buildRandomRecords(int records) {

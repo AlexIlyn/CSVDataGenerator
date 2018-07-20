@@ -88,7 +88,10 @@ public class RandomValueUtils {
 			case CURRENCY_CD:
 				return Integer.toString(810);
 			case AGR_CRED_STTS_TYPE_ID:
-				return getRandomAGR_CRED_STTS_TYPE_ID();
+				return Integer.toString(getRandomIntInRange(0, 200000));
+			//TODO return getRandomAGR_CRED_STTS_TYPE_ID();
+			case CUST_ID:
+				return Integer.toString(getRandomIntInRange(0, Integer.MAX_VALUE - 1));
 			default:
 				return null;
 		}
