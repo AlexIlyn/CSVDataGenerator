@@ -27,14 +27,17 @@ public class CSV_TestDataBuilder {
 	private String[] headersArray;
 	private Resource TYPE_MAPPING_RES;
 
-	private List<String[]> records;
+    private final List<String[]> records;
+
+    public List<String[]> getRecords() {
+        return this.records;
+    }
 
 	public CSV_TestDataBuilder(String caseType, String caseSubType, Path OUTPUT) throws IOException {
 		TYPE_MAPPING_RES = new ClassPathResource(String.format("%s\\%s\\TYPE_MAPPING.txt", caseType, caseSubType));
-		this.OUTPUT = OUTPUT.toAbsolutePath();
+        this.OUTPUT = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().getPath().substring(1) + OUTPUT);
 		typeMapping = initColumnDataTypesMap(TYPE_MAPPING_RES);
 		records = new ArrayList<>();
-		//TODO System.out.println(new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "\\VERYNEW_NEW.NEW"));
 	}
 
 	public CSV_TestDataBuilder buildRandomRecords(int records) {
@@ -57,6 +60,7 @@ public class CSV_TestDataBuilder {
 	}
 
 	public CSV_TestDataBuilder setValueOfFieldsWithType(ValueType valueType, String value){
+        if (valueTypeListMap.get(valueType) == null) return this;
 		for (int index : valueTypeListMap.get(valueType)){
 			for (String[] record : records){
 				record[index] = value;
