@@ -26,6 +26,7 @@ public class CSV_TestDataBuilder {
 	private Map<String, Integer> headersMap;
 	private String[] headersArray;
 	private Resource TYPE_MAPPING_RES;
+	private Resource GENERATED_FILE_RESOURCE;
 
 	private List<String[]> records;
 
@@ -34,7 +35,8 @@ public class CSV_TestDataBuilder {
 		this.OUTPUT = OUTPUT.toAbsolutePath();
 		typeMapping = initColumnDataTypesMap(TYPE_MAPPING_RES);
 		records = new ArrayList<>();
-		//TODO System.out.println(new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "\\VERYNEW_NEW.NEW"));
+		new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "\\" + OUTPUT).createNewFile();
+		GENERATED_FILE_RESOURCE = new ClassPathResource(OUTPUT.toString());
 	}
 
 	public CSV_TestDataBuilder buildRandomRecords(int records) {
