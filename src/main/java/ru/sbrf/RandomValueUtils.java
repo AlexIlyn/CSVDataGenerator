@@ -1,19 +1,29 @@
 package ru.sbrf;
 
+import com.github.javafaker.Faker;
+import com.github.javafaker.Name;
+
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RandomValueUtils {
 	private static Random r = new Random();
-	private static final String AGR_CRED_TYPE_EXCLUDE_1010 = "-1010";
-	private static final String EKS_AGR_CRED_TYPE_ID_EXCLUDE = "-1007";
-	private static final List<String> AGR_CRED_STTS_TYPE_ID_EXCLUDE = Arrays.asList(null, "", "-1", "36206", "74006",
+	public static final String AGR_CRED_TYPE_EXCLUDE_1010 = "-1010";
+	public static final String EKS_AGR_CRED_TYPE_ID_EXCLUDE = "-1007";
+	public static final List<String> AGR_CRED_STTS_TYPE_ID_EXCLUDE = Arrays.asList(null, "", "-1", "36206", "74006",
 		"60506", "74106", "5906", "33506", "45406", "49806", "44706", "47006", "42606", "45306", "47506", "74406",
 		"74306", "49306", "36106", "76406", "76906", "74206", "75906", "44006", "55206", "70906", "75406", "38806",
 		"74806", "55306", "76806", "52106", "45606", "45206", "51106", "82806", "44806", "66606", "47706", "34006",
 		"80806", "35206", "51206", "76606", "64206", "46506", "53206", "36506", "37306", "78806");
+
+	private static final int LEGAL_ENTITY = 0;
+	public static final int BUSINESS_PERSON = 1;
+	public static final String[] CUST_TYPE_CD_VARIANTS = new String[]{"Организация", "Индивидуальный предприниматель"};
+
+	public static Faker faker = new Faker(new Locale("ru"));
 
 	public static String getRandomFormatedDate(String format) {
 		DateFormat dateFormat = new SimpleDateFormat(format);
@@ -73,6 +83,8 @@ public class RandomValueUtils {
 				return getRandomIntInRange((int) Math.pow(10, 7), (int) Math.pow(10, 8) - 1) + "/" + getRandomIntInRange((int) Math.pow(10, 7), (int) Math.pow(10, 8) - 1);
 			case DATE:
 				return getRandomFormatedDate("yyyy-mm-dd");
+			case DATE_JOINED:
+				return getRandomFormatedDate("yyyymmdd");
 			case FLAG:
 				return getRandomFlag();
 			case TINYINT:
@@ -92,6 +104,16 @@ public class RandomValueUtils {
 			//TODO return getRandomAGR_CRED_STTS_TYPE_ID();
 			case CUST_ID:
 				return Integer.toString(getRandomIntInRange(0, Integer.MAX_VALUE - 1));
+			case COMPANY_NAME:
+				return faker.company().name();
+			case PERSON_FULL_NAME:
+				return faker.name().name();
+			case CUST_TYPE_CD:
+				return CUST_TYPE_CD_VARIANTS[getRandomIntInRange(0, 1)];
+			case CUST_TYPE_CD_LEGAL_ENTITY:
+				return CUST_TYPE_CD_VARIANTS[LEGAL_ENTITY];
+			case CUST_TYPE_CD_BUSINESS_PERSON:
+				return CUST_TYPE_CD_VARIANTS[BUSINESS_PERSON];
 			default:
 				return null;
 		}
