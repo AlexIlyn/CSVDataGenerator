@@ -47,7 +47,7 @@ public class RandomValueUtils {
 		return randomDate;
 	}
 
-	public static int getRandomIntInRange(int min, int max) {
+	public static Integer getRandomIntInRange(int min, int max) {
 		if (min >= max) {
 			throw new IllegalArgumentException("max must be greater than min");
 		}
@@ -87,6 +87,8 @@ public class RandomValueUtils {
 				return getRandomFormatedDate("yyyymmdd");
 			case FLAG:
 				return getRandomFlag();
+			case SHORT:
+				Integer.toString(getRandomIntInRange(0, Short.MAX_VALUE));
 			case TINYINT:
 				return Integer.toString(getRandomIntInRange(0, 20));
 			case SMALLINT:

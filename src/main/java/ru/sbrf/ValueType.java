@@ -5,6 +5,7 @@ public enum ValueType {
 	DATE,
 	DATE_JOINED,
 	FLAG,
+	SHORT,
 	TINYINT,
 	SMALLINT,
 	BIGINT,

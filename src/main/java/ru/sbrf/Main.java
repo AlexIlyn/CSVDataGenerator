@@ -1,15 +1,17 @@
 package ru.sbrf;
 
-import org.apache.commons.csv.CSVUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.ClassUtils;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static ru.sbrf.RandomValueUtils.getRandomIntInRange;
+import static ru.sbrf.RandomValueUtils.getRandomValueByValueType;
+import static ru.sbrf.ValueType.BIGINT;
+import static ru.sbrf.ValueType.SHORT;
+import static ru.sbrf.ValueType.SMALLINT;
 
 public class Main {
 
@@ -20,10 +22,84 @@ public class Main {
 
 	private static final String DEFAULT_CUST_ID = "0123456789";
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+	public static void main(String[] args) throws IOException {
+		generateFileForReferenceTest();
+		//generateAgrCredForUpdate();
+		//generateSingleAgrCred();
+	}
+
+	private static void generateAgrCredForUpdate() throws IOException {
+		CSV_TestDataBuilder agrCredEmptyDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRCRED", Paths.get("DRPA_AGRCRED_UPDATE_INIT.txt"));
+		CSV_TestDataBuilder agrCredUpdDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRCRED", Paths.get("DRPA_AGRCRED_UPDATE_SET.txt"));
+		agrCredUpdDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.setAllRecordsFieldValue("agr_cred_id", "787878")
+				.setAllRecordsFieldValue("host_agr_cred_id", "969696")
+				.setAllRecordsFieldValue("gregor_dt", "20101010")
+				.setAllRecordsFieldValue("agr_cred_type_id", "516516")
+				.setAllRecordsFieldValue("agr_cred_stts_type_id", "100001")
+				.generate();
+		agrCredEmptyDataBuilder.buildEmptyRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldValue("agr_cred_id", "787878")
+				.setAllRecordsFieldValue("host_agr_cred_id", "969696")
+				.setAllRecordsFieldValue("gregor_dt", "20101010")
+				.setAllRecordsFieldValue("agr_cred_type_id", "516516")
+				.setAllRecordsFieldValue("agr_cred_stts_type_id", "100001")
+				.generate();
+	}
+
+	private static void generateSingleAgrCred() throws IOException {
 		CSV_TestDataBuilder custDataBuilder = new CSV_TestDataBuilder("DRPA", "CUST_LEGAL_ENTITY", Paths.get("DRPA_CUST.txt"));
 		CSV_TestDataBuilder agrCredDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRCRED", Paths.get("DRPA_AGRCRED.txt"));
-		custDataBuilder.buildRandomRecord().setValueOfFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID).setValueOfFieldsWithType(ValueType.DECIMAL, "5").generate();
-		agrCredDataBuilder.buildRandomRecord().setValueOfFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID).setValueOfFieldsWithType(ValueType.DECIMAL, "5").generate();
-    }
+		custDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.generate();
+		agrCredDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.generate();
+	}
+
+	public static void generateFileForReferenceTest() throws IOException {
+		CSV_TestDataBuilder custDataBuilder = new CSV_TestDataBuilder("DRPA", "CUST_LEGAL_ENTITY", Paths.get("DRPA_CUST_REF.txt"));
+		CSV_TestDataBuilder agrCredDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRCRED", Paths.get("DRPA_AGRCRED_REF.txt"));
+		custDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.generate();
+		agrCredDataBuilder
+				//with eks_a_f26_agr_cred_type_id
+				.buildRandomRecord()
+				.setLastRecordFieldValue("#eks_a_f26_agr_cred_type_id", getRandomValueByValueType(SHORT))
+				//no eks_a_f26_agr_cred_type_id
+				.buildRandomRecord()
+				.setLastRecordFieldValue("#eks_a_f26_agr_cred_type_id", "")
+				.setLastRecordFieldValue("f26_agr_cred_type_id", getRandomValueByValueType(SHORT))
+				//no eks_a_f26_agr_cred_type_id and agr_cred_type_id == -1006
+				.buildRandomRecord()
+				.setLastRecordFieldValue("agr_cred_type_id", "-1006")
+				.setLastRecordFieldValue("#eks_a_f26_agr_cred_type_id", "")
+				.setLastRecordFieldValue("f26_agr_cred_type_id", getRandomValueByValueType(SHORT))
+
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.setAllRecordsFieldValue("mis_prod_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("agr_regls_type_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("agr_qlty_cat_type_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("agr_srv_qlty_type_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("issue_int_org_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("srv_int_org_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("agr_cred_stts_type_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("agr_cred_stts_type_cd", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("agr_cred_stts_type_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("agr_cred_stts_type_cd", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("issue_crncy_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("issue_crncy_cd", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("crncy_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.setAllRecordsFieldValue("crncy_cd", RandomValueUtils.getRandomValueByValueType(BIGINT))
+				.generate();
+	}
 }

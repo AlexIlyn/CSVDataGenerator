@@ -27,15 +27,15 @@ public class CSV_TestDataBuilder {
 	private String[] headersArray;
 	private Resource TYPE_MAPPING_RES;
 
-    private final List<String[]> records;
+	private final List<String[]> records;
 
-    public List<String[]> getRecords() {
-        return this.records;
-    }
+	public List<String[]> getRecords() {
+		return this.records;
+	}
 
 	public CSV_TestDataBuilder(String caseType, String caseSubType, Path OUTPUT) throws IOException {
 		TYPE_MAPPING_RES = new ClassPathResource(String.format("%s\\%s\\TYPE_MAPPING.txt", caseType, caseSubType));
-        this.OUTPUT = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().getPath().substring(1) + OUTPUT);
+		this.OUTPUT = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().getPath().substring(1) + OUTPUT);
 		typeMapping = initColumnDataTypesMap(TYPE_MAPPING_RES);
 		records = new ArrayList<>();
 	}
@@ -59,13 +59,72 @@ public class CSV_TestDataBuilder {
 		return this;
 	}
 
-	public CSV_TestDataBuilder setValueOfFieldsWithType(ValueType valueType, String value){
-        if (valueTypeListMap.get(valueType) == null) return this;
-		for (int index : valueTypeListMap.get(valueType)){
-			for (String[] record : records){
+	public CSV_TestDataBuilder buildEmptyRecord() {
+		String[] result_array = new String[headersMap.size()];
+		for (String header : headersArray) {
+			if (typeMapping.get(header) != null) {
+				result_array[headersMap.get(header)] = "";
+			}
+		}
+		records.add(result_array);
+		return this;
+	}
+
+	public CSV_TestDataBuilder setAllRecordsFieldsWithType(ValueType valueType, String value) {
+		if (valueTypeListMap.get(valueType) == null) return this;
+		for (int index : valueTypeListMap.get(valueType)) {
+			for (String[] record : records) {
 				record[index] = value;
 			}
 		}
+		return this;
+	}
+
+	public CSV_TestDataBuilder setLastRecorFieldsWithType(ValueType fieldType, String value) {
+		if (valueTypeListMap.get(fieldType) == null) return this;
+		for (int index : valueTypeListMap.get(fieldType)) {
+			records.get(records.size() - 1)[index] = value;
+		}
+		return this;
+	}
+
+	public CSV_TestDataBuilder setAllRecordsFieldsToRandom(ValueType fieldType, ValueType randomValueType) {
+		if (valueTypeListMap.get(fieldType) == null) return this;
+		for (int index : valueTypeListMap.get(fieldType)) {
+			for (String[] record : records) {
+				record[index] = RandomValueUtils.getRandomValueByValueType(randomValueType);
+			}
+		}
+		return this;
+	}
+
+	public CSV_TestDataBuilder setLastRecorFieldsToRandom(ValueType fieldType, ValueType randomValueType) {
+		if (valueTypeListMap.get(fieldType) == null) return this;
+		for (int index : valueTypeListMap.get(fieldType)) {
+			records.get(records.size() - 1)[index] = RandomValueUtils.getRandomValueByValueType(randomValueType);
+		}
+		return this;
+	}
+
+	public CSV_TestDataBuilder setAllRecordsFieldValue(String field, String value) {
+		if (headersMap.get(field) == null) return this;
+		for (String[] record : records) {
+			record[headersMap.get(field)] = value;
+		}
+		return this;
+	}
+
+	public CSV_TestDataBuilder setAllRecordsFieldRandomValue(String field, ValueType valueType) {
+		if (headersMap.get(field) == null) return this;
+		for (String[] record : records) {
+			record[headersMap.get(field)] = RandomValueUtils.getRandomValueByValueType(valueType);
+		}
+		return this;
+	}
+
+	public CSV_TestDataBuilder setLastRecordFieldValue(String field, String value) {
+		if (headersMap.get(field) == null) return this;
+		records.get(records.size() - 1)[headersMap.get(field)] = value;
 		return this;
 	}
 
@@ -85,8 +144,8 @@ public class CSV_TestDataBuilder {
 	}
 
 	public CSV_TestDataBuilder destroy() throws IOException {
-		File file =  new File(OUTPUT.toString());
-		if(file.exists()) file.delete();
+		File file = new File(OUTPUT.toString());
+		if (file.exists()) file.delete();
 		records.clear();
 		return this;
 	}
@@ -102,7 +161,7 @@ public class CSV_TestDataBuilder {
 		for (int i = 0; i < headersArray.length; i++) {
 			field = headersArray[i];
 			try {
-			type = ValueType.valueOf(csvRecord.get(headersArray[i]));
+				type = ValueType.valueOf(csvRecord.get(headersArray[i]));
 			} catch (IllegalArgumentException e) {
 				continue;
 			}
