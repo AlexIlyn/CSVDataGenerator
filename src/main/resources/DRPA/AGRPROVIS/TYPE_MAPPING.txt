@@ -1,0 +1,2 @@
+agr_collat_crncy_id;asset_pledge_type_id;agr_collat_id;agr_num;host_agr_collat_id;coa_num;cust_id;agr_collat_amt;agr_collat_rub;mkt_price_amt;mkt_crncy_id;mkt_price_rub;open_dt;expiration_dt
+SMALLINT;SMALLINT;BIGINT;AGRNUM;BIGINT;DECIMAL;CUST_ID;DECIMAL;DECIMAL;DECIMAL;BIGINT;DECIMAL;DATE;DATE

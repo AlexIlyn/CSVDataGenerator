@@ -7,11 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static ru.sbrf.RandomValueUtils.getRandomIntInRange;
-import static ru.sbrf.RandomValueUtils.getRandomValueByValueType;
 import static ru.sbrf.ValueType.BIGINT;
-import static ru.sbrf.ValueType.SHORT;
-import static ru.sbrf.ValueType.SMALLINT;
 
 public class Main {
 
@@ -23,7 +19,9 @@ public class Main {
 	private static final String DEFAULT_CUST_ID = "0123456789";
 
 	public static void main(String[] args) throws IOException {
-		generateFileForReferenceTest();
+		//generateFileForReferenceTest();
+		//generateDublicatesAgrCred();
+		generateSingleAgrProvis();
 		//generateAgrCredForUpdate();
 		//generateSingleAgrCred();
 	}
@@ -50,6 +48,53 @@ public class Main {
 				.generate();
 	}
 
+	private static void generateDublicatesAgrCred() throws IOException {
+		CSV_TestDataBuilder custDataBuilder = new CSV_TestDataBuilder("DRPA", "CUST_LEGAL_ENTITY", Paths.get("DRPA_CUST.txt"));
+		CSV_TestDataBuilder agrCredDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRCRED", Paths.get("DRPA_AGRCRED_DUBLICATES.txt"));
+		custDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.generate();
+		agrCredDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.copyLastRecord()
+				.copyLastRecord()
+				.copyLastRecord()
+				.setAllRecordsFieldRandomValue("gregor_dt", ValueType.DATE_JOINED)
+				.generate();
+	}
+
+	private static void generateAgrProvisForUpdate() throws IOException {
+		CSV_TestDataBuilder custDataBuilder = new CSV_TestDataBuilder("DRPA", "CUST_LEGAL_ENTITY", Paths.get("DRPA_CUST.txt"));
+		CSV_TestDataBuilder agrProvisDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRPROVIS", Paths.get("DRPA_AGRPROVIS.txt"));
+		custDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.generate();
+		agrProvisDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.generate();
+	}
+
+	private static void generateSingleAgrProvis() throws IOException {
+		CSV_TestDataBuilder custDataBuilder = new CSV_TestDataBuilder("DRPA", "CUST_LEGAL_ENTITY", Paths.get("DRPA_CUST.txt"));
+		CSV_TestDataBuilder agrProvisUpdateInitDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRPROVIS", Paths.get("DRPA_AGRPROVIS_UPD_INIT.txt"));
+		CSV_TestDataBuilder agrProvisUpdateSetDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRPROVIS", Paths.get("DRPA_AGRPROVIS_UPD_SET.txt"));
+		custDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.generate();
+		agrProvisUpdateInitDataBuilder.buildEmptyRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.generate();
+		agrProvisUpdateSetDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.generate();
+	}
+
 	private static void generateSingleAgrCred() throws IOException {
 		CSV_TestDataBuilder custDataBuilder = new CSV_TestDataBuilder("DRPA", "CUST_LEGAL_ENTITY", Paths.get("DRPA_CUST.txt"));
 		CSV_TestDataBuilder agrCredDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRCRED", Paths.get("DRPA_AGRCRED.txt"));
@@ -73,16 +118,16 @@ public class Main {
 		agrCredDataBuilder
 				//with eks_a_f26_agr_cred_type_id
 				.buildRandomRecord()
-				.setLastRecordFieldValue("#eks_a_f26_agr_cred_type_id", getRandomValueByValueType(SHORT))
 				//no eks_a_f26_agr_cred_type_id
 				.buildRandomRecord()
 				.setLastRecordFieldValue("#eks_a_f26_agr_cred_type_id", "")
-				.setLastRecordFieldValue("f26_agr_cred_type_id", getRandomValueByValueType(SHORT))
+				//with eks_a_f26_agr_cred_type_id and agr_cred_type_id == -1006
+				.buildRandomRecord()
+				.setLastRecordFieldValue("agr_cred_type_id", "-1006")
 				//no eks_a_f26_agr_cred_type_id and agr_cred_type_id == -1006
 				.buildRandomRecord()
 				.setLastRecordFieldValue("agr_cred_type_id", "-1006")
 				.setLastRecordFieldValue("#eks_a_f26_agr_cred_type_id", "")
-				.setLastRecordFieldValue("f26_agr_cred_type_id", getRandomValueByValueType(SHORT))
 
 				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
 				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
@@ -92,8 +137,6 @@ public class Main {
 				.setAllRecordsFieldValue("agr_srv_qlty_type_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
 				.setAllRecordsFieldValue("issue_int_org_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
 				.setAllRecordsFieldValue("srv_int_org_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
-				.setAllRecordsFieldValue("agr_cred_stts_type_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
-				.setAllRecordsFieldValue("agr_cred_stts_type_cd", RandomValueUtils.getRandomValueByValueType(BIGINT))
 				.setAllRecordsFieldValue("agr_cred_stts_type_id", RandomValueUtils.getRandomValueByValueType(BIGINT))
 				.setAllRecordsFieldValue("agr_cred_stts_type_cd", RandomValueUtils.getRandomValueByValueType(BIGINT))
 				.setAllRecordsFieldValue("issue_crncy_id", RandomValueUtils.getRandomValueByValueType(BIGINT))

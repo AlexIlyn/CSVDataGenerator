@@ -128,6 +128,11 @@ public class CSV_TestDataBuilder {
 		return this;
 	}
 
+	public CSV_TestDataBuilder copyLastRecord() {
+		records.add(records.get(records.size() - 1).clone());
+		return this;
+	}
+
 	public void generate() throws IOException {
 		try (
 				BufferedWriter writer = Files.newBufferedWriter(OUTPUT);

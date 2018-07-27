@@ -87,12 +87,14 @@ public class RandomValueUtils {
 				return getRandomFormatedDate("yyyymmdd");
 			case FLAG:
 				return getRandomFlag();
+			case BYTE:
+				return Integer.toString(getRandomIntInRange(0, Byte.MAX_VALUE));
 			case SHORT:
 				Integer.toString(getRandomIntInRange(0, Short.MAX_VALUE));
 			case TINYINT:
 				return Integer.toString(getRandomIntInRange(0, 20));
 			case SMALLINT:
-				return Integer.toString(getRandomIntInRange(0, Byte.MAX_VALUE));
+				return Integer.toString(getRandomIntInRange(0, (int) Math.pow(2, 16)));
 			case BIGINT:
 				return Integer.toString(getRandomIntInRange((int) Math.pow(10, 9), (int) Math.pow(10, 10) - 1));
 			case DECIMAL:
