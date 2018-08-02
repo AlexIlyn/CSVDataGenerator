@@ -13,17 +13,75 @@ public class Main {
 
 	private static Resource TYPE_MAPPING = new ClassPathResource("TYPE_MAPPING.txt");
 	private static Resource HEADER_TEMPLATE = new ClassPathResource("HEADER_TEMPLATE.txt");
-	private static Path OUTPUT = Paths.get("DRPA_VALID_AGR_CRED.txt");
-	private static Resource GENERATED_FILES = new ClassPathResource("generatedFiles");
+
+	/* Коды справочника "Статус кредитного договора */
+	private static final String STATUS_CLOSED = "CLOSE"; // Закрыт
+	private static final String STATUS_WORK = "WORK"; // Работает
+	private static final String STATUS_WITHDRAWN = "D_OUT_BAL"; // Снят с баланса
+	private static final String STATUS_INVALID = "INVALIDSTATUS"; // Не учитываемый статус
 
 	private static final String DEFAULT_CUST_ID = "0123456789";
 
 	public static void main(String[] args) throws IOException {
 		//generateFileForReferenceTest();
 		//generateDublicatesAgrCred();
-		generateSingleAgrProvis();
+		//generateSingleAgrProvis();
+		//generateAgrProvisForUpdate();
+		//generateAgrCredForOSZ();
+		//generateAgrCredForOSZ_Update();
+		generateSecondCustFile();
 		//generateAgrCredForUpdate();
 		//generateSingleAgrCred();
+	}
+
+	private static void generateAgrCredForOSZ_Update() throws IOException {
+		CSV_TestDataBuilder agrCredUpdDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRCRED", Paths.get("DRPA_AGRCRED_CALCULATE_OSZ_UPDATE.txt"));
+		agrCredUpdDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.setAllRecordsFieldValue("debt_rub", "300000")
+				.setAllRecordsFieldValue("gregor_dt", "20101005")
+				.setLastRecordFieldValue("agr_cred_stts_type_cd", STATUS_CLOSED)
+				.setLastRecordFieldValue("agr_cred_id", "123")
+				.setLastRecordFieldValue("host_agr_cred_id", "123")
+				.copyLastRecord()
+				.setLastRecordFieldValue("agr_cred_stts_type_cd", STATUS_WORK)
+				.setLastRecordFieldValue("agr_cred_id", "456")
+				.setLastRecordFieldValue("host_agr_cred_id", "456")
+				.copyLastRecord()
+				.setLastRecordFieldValue("agr_cred_stts_type_cd", STATUS_WITHDRAWN)
+				.setLastRecordFieldValue("agr_cred_id", "789")
+				.setLastRecordFieldValue("host_agr_cred_id", "789")
+				.copyLastRecord()
+				.setLastRecordFieldValue("agr_cred_stts_type_cd", STATUS_INVALID)
+				.setLastRecordFieldValue("agr_cred_id", "147")
+				.setLastRecordFieldValue("host_agr_cred_id", "147")
+				.generate();
+	}
+
+	private static void generateAgrCredForOSZ() throws IOException {
+		CSV_TestDataBuilder agrCredUpdDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRCRED", Paths.get("DRPA_AGRCRED_CALCULATE_OSZ.txt"));
+		agrCredUpdDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.setAllRecordsFieldValue("debt_rub", "250000")
+				.setAllRecordsFieldValue("gregor_dt", "20101001")
+				.setLastRecordFieldValue("agr_cred_stts_type_cd", STATUS_CLOSED)
+				.setLastRecordFieldValue("agr_cred_id", "123")
+				.setLastRecordFieldValue("host_agr_cred_id", "123")
+				.copyLastRecord()
+				.setLastRecordFieldValue("agr_cred_stts_type_cd", STATUS_WORK)
+				.setLastRecordFieldValue("agr_cred_id", "456")
+				.setLastRecordFieldValue("host_agr_cred_id", "456")
+				.copyLastRecord()
+				.setLastRecordFieldValue("agr_cred_stts_type_cd", STATUS_WITHDRAWN)
+				.setLastRecordFieldValue("agr_cred_id", "789")
+				.setLastRecordFieldValue("host_agr_cred_id", "789")
+				.copyLastRecord()
+				.setLastRecordFieldValue("agr_cred_stts_type_cd", STATUS_INVALID)
+				.setLastRecordFieldValue("agr_cred_id", "147")
+				.setLastRecordFieldValue("host_agr_cred_id", "147")
+				.generate();
 	}
 
 	private static void generateAgrCredForUpdate() throws IOException {
@@ -65,7 +123,49 @@ public class Main {
 				.generate();
 	}
 
-	private static void generateAgrProvisForUpdate() throws IOException {
+	private static void generateSecondCustFile() throws IOException {
+		CSV_TestDataBuilder custDataBuilder = new CSV_TestDataBuilder("DRPA", "CUST_LEGAL_ENTITY", Paths.get("DRPA_CUST_GSZ.txt"));
+		custDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.copyLastRecord()
+				.setLastRecorFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID + 1)
+				.setLastRecordFieldValue("full_name", RandomValueUtils.getRandomValueByValueType(ValueType.COMPANY_NAME))
+				.setLastRecordFieldValue("inn_num", RandomValueUtils.getRandomValueByValueType(ValueType.BIGINT))
+				.setLastRecordFieldValue("ogrn_num", RandomValueUtils.getRandomValueByValueType(ValueType.BIGINT))
+				.copyLastRecord()
+				.setLastRecorFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID + 2)
+				.setLastRecordFieldValue("full_name", RandomValueUtils.getRandomValueByValueType(ValueType.COMPANY_NAME))
+				.setLastRecordFieldValue("inn_num", RandomValueUtils.getRandomValueByValueType(ValueType.BIGINT))
+				.setLastRecordFieldValue("ogrn_num", RandomValueUtils.getRandomValueByValueType(ValueType.BIGINT))
+				.generate();
+		CSV_TestDataBuilder agrCredDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRCRED", Paths.get("DRPA_AGRCRED_GSZ.txt"));
+		agrCredDataBuilder.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.setAllRecordsFieldValue("debt_rub", "100000")
+				.setAllRecordsFieldValue("gregor_dt", "20101001")
+				.setLastRecordFieldValue("agr_cred_stts_type_cd", STATUS_CLOSED)
+				.setLastRecordFieldValue("agr_cred_id", "123")
+				.setLastRecordFieldValue("host_agr_cred_id", "123")
+				.copyLastRecord()
+				.setLastRecorFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID + 1)
+				.copyLastRecord()
+				.setLastRecorFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID + 2)
+				.generate();
+		CSV_TestDataBuilder agrCredDataBuilderUpd = new CSV_TestDataBuilder("DRPA", "AGRCRED", Paths.get("DRPA_AGRCRED_GSZ_UPDATE.txt"));
+		agrCredDataBuilderUpd.buildRandomRecord()
+				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.setAllRecordsFieldValue("debt_rub", "200000")
+				.setAllRecordsFieldValue("gregor_dt", "20101001")
+				.setLastRecordFieldValue("agr_cred_stts_type_cd", STATUS_CLOSED)
+				.setLastRecordFieldValue("agr_cred_id", "123")
+				.setLastRecordFieldValue("host_agr_cred_id", "123")
+				.generate();
+	}
+
+	private static void generateSingleAgrProvis() throws IOException {
 		CSV_TestDataBuilder custDataBuilder = new CSV_TestDataBuilder("DRPA", "CUST_LEGAL_ENTITY", Paths.get("DRPA_CUST.txt"));
 		CSV_TestDataBuilder agrProvisDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRPROVIS", Paths.get("DRPA_AGRPROVIS.txt"));
 		custDataBuilder.buildRandomRecord()
@@ -78,20 +178,26 @@ public class Main {
 				.generate();
 	}
 
-	private static void generateSingleAgrProvis() throws IOException {
+	private static void generateAgrProvisForUpdate() throws IOException {
 		CSV_TestDataBuilder custDataBuilder = new CSV_TestDataBuilder("DRPA", "CUST_LEGAL_ENTITY", Paths.get("DRPA_CUST.txt"));
-		CSV_TestDataBuilder agrProvisUpdateInitDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRPROVIS", Paths.get("DRPA_AGRPROVIS_UPD_INIT.txt"));
-		CSV_TestDataBuilder agrProvisUpdateSetDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRPROVIS", Paths.get("DRPA_AGRPROVIS_UPD_SET.txt"));
+		CSV_TestDataBuilder agrProvisUpdateInitDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRPROVIS", Paths.get("DRPA_AGRPROVIS_UPDATE_INIT.txt"));
+		CSV_TestDataBuilder agrProvisUpdateSetDataBuilder = new CSV_TestDataBuilder("DRPA", "AGRPROVIS", Paths.get("DRPA_AGRPROVIS_UPDATE_SET.txt"));
 		custDataBuilder.buildRandomRecord()
 				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
 				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
 				.generate();
+		String AGR_COLLAT_ID = RandomValueUtils.getRandomValueByValueType(ValueType.BIGINT);
+		String HOST_AGR_COLLAT_ID = RandomValueUtils.getRandomValueByValueType(ValueType.BIGINT);
 		agrProvisUpdateInitDataBuilder.buildEmptyRecord()
 				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
+				.setAllRecordsFieldValue("agr_collat_id", AGR_COLLAT_ID)
+				.setAllRecordsFieldValue("host_agr_collat_id", HOST_AGR_COLLAT_ID)
 				.generate();
 		agrProvisUpdateSetDataBuilder.buildRandomRecord()
 				.setAllRecordsFieldsWithType(ValueType.CUST_ID, DEFAULT_CUST_ID)
 				.setAllRecordsFieldsToRandom(ValueType.DECIMAL, ValueType.TINYINT)
+				.setAllRecordsFieldValue("agr_collat_id", AGR_COLLAT_ID)
+				.setAllRecordsFieldValue("host_agr_collat_id", HOST_AGR_COLLAT_ID)
 				.generate();
 	}
 
